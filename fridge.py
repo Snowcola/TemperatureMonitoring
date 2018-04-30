@@ -14,7 +14,7 @@ app.wsgi_app = socketio.Middleware(sio, app.wsgi_app)
 
 @app.route('/')
 def index():
-    return render_template('latency.html')
+    return render_template('fridge.html')
 
 @sio.on('connect')
 def connect(sid, environ):
