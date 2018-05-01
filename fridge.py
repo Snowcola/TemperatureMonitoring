@@ -1,5 +1,6 @@
 from flask import Flask, render_template, make_response, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 import socketio
 import random
@@ -20,6 +21,7 @@ migrate = Migrate(app, db)
 
 from models import Temp
 
+
 @app.route('/')
 def index():
     return render_template('fridge.html')
@@ -27,14 +29,14 @@ def index():
 
 @sio.on('connect')
 def connect(sid, environ):
-    print(f'connected on {sid}')    
+    print(f'connected on {sid}')
 
 
 @app.route('/testTemp')
 def newTemp():
     temp = random.randrange(2, 10)
-
-    resp = make_response('success',200)
+    sio.emit('new_temp', {'data': temp})
+    resp = make_response('success', 200)
     return resp
 
 
