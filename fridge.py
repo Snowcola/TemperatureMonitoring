@@ -33,7 +33,7 @@ def connect(sid, environ):
 @app.route('/testTemp')
 def newTemp():
     temp = random.randrange(2, 10)
-    sio.emit('new_temp', {'data': temp})
+
     resp = make_response('success',200)
     return resp
 
@@ -58,6 +58,7 @@ def submit_temp():
     temp = Temp(temperature=data['temp'])
     db.session.add(temp)
     db.session.commit()
+    sio.emit('new_temp', {'data': data['temp']})
     return make_response(jsonify({'success': temp}), 201)
 
 
