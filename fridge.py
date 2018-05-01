@@ -1,9 +1,12 @@
-from flask import Flask, render_template, make_response, jsonify
+from flask import Flask, render_template, make_response, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+
 import socketio
 import random
+import json
+
+from .utils import json_response, JSON_MIME_TYPE
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 
 
 async_mode = None
@@ -15,7 +18,7 @@ app.wsgi_app = socketio.Middleware(sio, app.wsgi_app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-import models
+from models import Temp
 
 @app.route('/')
 def index():
@@ -27,10 +30,8 @@ def connect(sid, environ):
     print(f'connected on {sid}')    
 
 
-@app.route('/newTemp')
+@app.route('/testTemp')
 def newTemp():
-    # get data from request
-    # add temp to DB
     temp = random.randrange(2, 10)
     sio.emit('new_temp', {'data': temp})
     resp = make_response('success',200)
@@ -45,7 +46,19 @@ def get_temps():
 
 @app.route('/api/v1/submit_temp', methods=['POST'])
 def submit_temp():
-    return make_response(jsonify({'success': 'Temperture point added'}), 201)
+    if request.content_type != JSON_MIME_TYPE:
+        error = json.dumps({'error': 'Invalid Content Type'})
+        return json_response(error, 400)
+
+    data = request.json
+    if not data.get('temp'):
+        error = json.dumps({'error': 'Missing field (temp)'})
+        return json_response(error, 400)
+
+    temp = Temp(temperature=data['temp'])
+    db.session.add(temp)
+    db.session.commit()
+    return make_response(jsonify({'success': temp}), 201)
 
 
 if __name__ == '__main__':
