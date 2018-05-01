@@ -7,8 +7,16 @@ name = "pypi"
 eventlet = "*"
 flask = "*"
 python-socketio = "*"
+flask-restful = "*"
+flask-sqlalchemy = "*"
+marshmallow = "*"
+marshmallow-jsonapi = "*"
+"psycopg2" = "*"
+flask-migrate = "*"
+flask-script = "*"
 
 [dev-packages]
+"flake8" = "*"
 
 [requires]
 python_version = "3.6"

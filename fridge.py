@@ -1,33 +1,51 @@
-# set async_mode to 'threading', 'eventlet', 'gevent' or 'gevent_uwsgi' to
-# force a mode else, the best mode is selected automatically from what's
-# installed
-async_mode = None
-
-from flask import Flask, render_template, make_response
+from flask import Flask, render_template, make_response, jsonify
 import socketio
 import random
+from config import Config
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+
+async_mode = None
 
 sio = socketio.Server(async_mode=async_mode)
 app = Flask(__name__)
+app.config.from_object(Config)
 app.wsgi_app = socketio.Middleware(sio, app.wsgi_app)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
+import models
 
 @app.route('/')
 def index():
     return render_template('fridge.html')
 
+
 @sio.on('connect')
 def connect(sid, environ):
     print(f'connected on {sid}')    
 
+
 @app.route('/newTemp')
 def newTemp():
-    #get data from request
-    #add temp to DB
+    # get data from request
+    # add temp to DB
     temp = random.randrange(2, 10)
     sio.emit('new_temp', {'data': temp})
     resp = make_response('success',200)
     return resp
+
+
+@app.route('/api/v1/temps', methods=['GET'])
+def get_temps():
+    temps = [1, 1]  # TODO: query db
+    return jsonify({'temps': temps})
+
+
+@app.route('/api/v1/submit_temp', methods=['POST'])
+def submit_temp():
+    return make_response(jsonify({'success': 'Temperture point added'}), 201)
 
 
 if __name__ == '__main__':
