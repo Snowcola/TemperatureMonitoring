@@ -30,7 +30,6 @@ socket.on('new_temp', function(msg) {
                   temps.shift();
                   labels.shift();
               }
-              $('#temperature').text(msg.data + 'degC');
               chart1.update();
               send();
           }

@@ -6,7 +6,7 @@ import socketio
 import random
 import json
 
-from .utils import json_response, JSON_MIME_TYPE
+from utils import json_response, JSON_MIME_TYPE
 from config import Config
 
 
@@ -19,7 +19,7 @@ app.wsgi_app = socketio.Middleware(sio, app.wsgi_app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-from models import Temp
+#from models import Temp
 
 
 @app.route('/')
@@ -56,12 +56,12 @@ def submit_temp():
     if not data.get('temp'):
         error = json.dumps({'error': 'Missing field (temp)'})
         return json_response(error, 400)
-
+    '''
     temp = Temp(temperature=data['temp'])
     db.session.add(temp)
-    db.session.commit()
+    db.session.commit()'''
     sio.emit('new_temp', {'data': data['temp']})
-    return make_response(jsonify({'success': temp}), 201)
+    return jsonify({'success': 'yay'}), 201
 
 
 if __name__ == '__main__':
