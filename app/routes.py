@@ -46,12 +46,12 @@ def submit_temp():
     if not data.get('temp'):
         error = json.dumps({'error': 'Missing field (temp)'})
         return json_response(error, 400)
-    '''
+    
     temp = Temp(temperature=data['temp'])
     db.session.add(temp)
-    db.session.commit()'''
+    db.session.commit()
     sio.emit('new_temp', {'data': data['temp']})
-    return jsonify({'success': 'yay'}), 201
+    return jsonify({'success': temp.temperature}), 201
 
 
 if __name__ == '__main__':
@@ -62,7 +62,6 @@ if __name__ == '__main__':
         # deploy with eventlet
         import eventlet
         import eventlet.wsgi
-        print('I WAS CHOSEN')
         eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
     elif sio.async_mode == 'gevent':
         # deploy with gevent
