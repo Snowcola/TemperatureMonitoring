@@ -19,7 +19,7 @@ socket.on('disconnect', function() {
 
 var temps = new Array;
 socket.on('new_temp', function(msg) {
-          $('#log').append('<br>Temp: ' + msg.data + ' degC');
+          //$('#log').append('<br>Temp: ' + msg.data + ' degC');
           if (time) {
               time.append(+new Date, msg.data);
           }
@@ -30,8 +30,10 @@ socket.on('new_temp', function(msg) {
                   temps.shift();
                   labels.shift();
               }
+              $('#temperature').text(msg.data + ' deg C')
               chart1.update();
               send();
+
           }
 });
 
@@ -43,14 +45,18 @@ function send() {
 
   var smoothie;
   var time;
-  var max = 10;
-  var min = 0;
+  var max = 15;
+  var min = -5;
   var sections = max - min;
   function render() {
       if (smoothie)
           smoothie.stop();
       chart.width = document.body.clientWidth;
-      smoothie = new SmoothieChart({verticalSections:sections, maxValue:max,minValue:min})
+      smoothie = new SmoothieChart({
+                                    grid:{verticalSections:sections}, 
+                                    maxValue:max,
+                                    minValue:min
+                                })
       smoothie.streamTo(chart, 2000);
       time = new TimeSeries();
       smoothie.addTimeSeries(time, {
@@ -63,7 +69,7 @@ function send() {
 // new chart - chartjs
 
 var labels = new Array;
-
+/*
 var ctx = document.getElementById('chart1').getContext('2d');
 ctx.canvas.width = 1000;
 ctx.canvas.height = 300;
@@ -104,4 +110,4 @@ var cfg = {
     }
   }
 };
-var chart1 = new Chart(ctx, cfg);
+var chart1 = new Chart(ctx, cfg);*/
